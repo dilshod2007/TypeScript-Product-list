@@ -1,6 +1,7 @@
 "use strict";
 const productForm = document.getElementById("productForm");
 const productList = document.getElementById("productList");
+const searchInput = document.getElementById("searchInput");
 productForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(productForm);
@@ -22,10 +23,13 @@ function saveProduct(product) {
     products.push(product);
     localStorage.setItem("products", JSON.stringify(products));
 }
-function displayProducts() {
+function displayProducts(searchQuery = "") {
     const products = JSON.parse(localStorage.getItem("products") || "[]");
     productList.innerHTML = '';
-    products.forEach((product) => {
+    const filteredProducts = products.filter(product => product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.supplier.toLowerCase().includes(searchQuery.toLowerCase()));
+    filteredProducts.forEach((product) => {
         const productCard = document.createElement("div");
         productCard.className = "product-card";
         productCard.innerHTML = `
@@ -46,4 +50,8 @@ function deleteProduct(name) {
     localStorage.setItem("products", JSON.stringify(products));
     displayProducts();
 }
+searchInput.addEventListener("input", (event) => {
+    const searchQuery = event.target.value;
+    displayProducts(searchQuery);
+});
 displayProducts();

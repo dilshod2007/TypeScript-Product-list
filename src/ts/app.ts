@@ -1,5 +1,6 @@
 const productForm = document.getElementById("productForm") as HTMLFormElement;
 const productList = document.getElementById("productList") as HTMLDivElement;
+const searchInput = document.getElementById("searchInput") as HTMLInputElement;
 
 interface Product {
   name: string;
@@ -33,10 +34,17 @@ function saveProduct(product: Product): void {
   localStorage.setItem("products", JSON.stringify(products));
 }
 
-function displayProducts(): void {
+function displayProducts(searchQuery: string = ""): void {
   const products = JSON.parse(localStorage.getItem("products") || "[]") as Product[];
   productList.innerHTML = '';  
-  products.forEach((product) => {
+  
+  const filteredProducts = products.filter(product => 
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.supplier.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  filteredProducts.forEach((product) => {
     const productCard = document.createElement("div");
     productCard.className = "product-card";
     productCard.innerHTML = `
@@ -58,5 +66,10 @@ function deleteProduct(name: string): void {
   localStorage.setItem("products", JSON.stringify(products));
   displayProducts();
 }
+
+searchInput.addEventListener("input", (event) => {
+  const searchQuery = (event.target as HTMLInputElement).value;
+  displayProducts(searchQuery);  
+});
 
 displayProducts();
